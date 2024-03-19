@@ -12,9 +12,11 @@ interface TaskProps {
     id: number;
     isCompleted: boolean;
   }) => void;
+
+  onTaskRemove: (id: number) => void;
 }
 
-export function Task({ task, onTaskStatusChange }: TaskProps) {
+export function Task({ task, onTaskStatusChange, onTaskRemove }: TaskProps) {
   function handleChangeTaskStatus() {
     onTaskStatusChange({ id: task.id, isCompleted: !task.isCompleted });
   }
@@ -49,15 +51,9 @@ export function Task({ task, onTaskStatusChange }: TaskProps) {
         </p>
       </label>
 
-      <button title="Deletar tarefa">
+      <button title="Deletar tarefa" onClick={() => onTaskRemove(task.id)}>
         <Trash size={16} color="#808080" />
       </button>
-
-      {task.isCompleted ? (
-        <p>Tarefa completa {task.id}</p>
-      ) : (
-        <p>Tarefa não completa {task.id}</p>
-      )}
     </div>
   );
 }

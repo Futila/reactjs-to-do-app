@@ -1,26 +1,11 @@
-import { FormEvent, useState } from "react";
-
-import { PlusCircle, Trash, Check } from "@phosphor-icons/react";
-
-import clipboard from "./assets/clipboard.svg";
+import { useState } from "react";
 
 import styles from "./App.module.css";
 import "./global.css";
+
 import { Task } from "./components/Task";
 import { Header } from "./components/Header";
-
-// const arrayDeTarefas = [
-//   { id: 1, title: "Estudar JavaScript", isCompleted: false },
-//   { id: 2, title: "Fazer compras", isCompleted: true },
-//   { id: 3, title: "Ir à academia", isCompleted: false },
-//   { id: 4, title: "Trabalhar em projetos", isCompleted: true },
-//   { id: 5, title: "Preparar refeições", isCompleted: false },
-//   { id: 6, title: "Assistir aulas online", isCompleted: true },
-//   { id: 7, title: "Ler um livro", isCompleted: false },
-//   { id: 8, title: "Praticar instrumento musical", isCompleted: true },
-//   { id: 9, title: "Caminhar ao ar livre", isCompleted: false },
-//   { id: 10, title: "Aprender novas habilidades", isCompleted: true },
-// ];
+import { EmpytList } from "./components/EmptyList";
 
 export interface ITask {
   id: number;
@@ -31,10 +16,6 @@ export interface ITask {
 export function App() {
   const [tasks, setTasks] = useState<ITask[]>([
     { id: 1, title: "Estudar JavaScript", isCompleted: false },
-    { id: 2, title: "Fazer compras", isCompleted: true },
-    { id: 3, title: "Ir à academia", isCompleted: false },
-    { id: 4, title: "Trabalhar em projetos", isCompleted: true },
-    { id: 5, title: "Preparar refeições", isCompleted: false },
   ]);
 
   const [newTask, setNewTask] = useState("");
@@ -54,6 +35,12 @@ export function App() {
     setNewTask("");
   }
 
+  function handleDeleteTask(id: number) {
+    const tasksWithDeletedOne = tasks.filter((task) => task.id !== id);
+
+    setTasks(tasksWithDeletedOne);
+  }
+
   function handleChangeTaskStatus({
     id,
     isCompleted,
@@ -71,6 +58,9 @@ export function App() {
 
     setTasks(updatedTasks);
   }
+
+  const totalTasksCreated = tasks.length;
+  const totalTasksCompleted = tasks.filter((task) => task.isCompleted).length;
   return (
     <>
       <Header
@@ -83,33 +73,31 @@ export function App() {
           <div className={styles.taskInfo}>
             <div className={styles.tasksCreated}>
               <strong>Tarefas criadas</strong>
-              <span className={styles.counter}>5</span>
+              <span className={styles.counter}>{totalTasksCreated}</span>
             </div>
             <div className={styles.tasksCompleted}>
               <strong>Concluídas</strong>
-              <span className={styles.counter}>2 de 5</span>
+              <span className={styles.counter}>
+                {totalTasksCompleted} de {totalTasksCreated}
+              </span>
             </div>
           </div>
-
-          {tasks.length === 0 && (
-            <div className={styles.emptyList}>
-              <img src={clipboard} alt="clipboard" />
-              <strong>Você ainda não tem tarefas cadastradas</strong>
-              <span>Crie tarefas e organize seus itens a fazer</span>
+          {tasks.length > 0 ? (
+            <div className={styles.taskListContainer}>
+              {tasks.map((task) => {
+                return (
+                  <Task
+                    key={task.id}
+                    task={task}
+                    onTaskRemove={handleDeleteTask}
+                    onTaskStatusChange={handleChangeTaskStatus}
+                  />
+                );
+              })}
             </div>
+          ) : (
+            <EmpytList />
           )}
-
-          <div className={styles.taskListContainer}>
-            {tasks.map((task) => {
-              return (
-                <Task
-                  key={task.id}
-                  task={task}
-                  onTaskStatusChange={handleChangeTaskStatus}
-                />
-              );
-            })}
-          </div>
         </section>
       </main>
     </>
